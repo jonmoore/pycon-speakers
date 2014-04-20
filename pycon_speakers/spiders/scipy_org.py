@@ -94,17 +94,22 @@ class SciPySpider(Spider):
         for author in sel.css('#registrants_table').re('>\s*-\s*(.+?)\s*(?:$|<)'):
             if author == '--':  # No author.
                 continue
-            sl = SpeakerLoader(selector=sel, response=response)
-            sl.add_value('name', author)
-            sl.add_value('year', response.meta['year'])
-            sl.add_value('conference', 'SciPy')
-            yield sl.load_item()
+            # author names actually are splitted by comma and reverted in order
+            names = author.split(',')
+            if len(names) == 2:
+                author = '%s %s' %(names[1], names[0])
+                sl = SpeakerLoader(selector=sel, response=response)
+                sl.add_value('name', author)
+                sl.add_value('year', response.meta['year'])
+                sl.add_value('conference', 'SciPy')
+                yield sl.load_item()
 
     def parse_2013(self, response):
         sel = Selector(response)
         # Probably this is the nicest layout of all versions.
         for authors in sel.css('.authors::text').extract():
             # FIXME: few entries miss the multiple-author separator ';'.
+            # this one is a mess
             for author in authors.split(';'):
                 sl = SpeakerLoader(selector=sel, response=response)
                 # FIXME: most author entry have the institution at the end.

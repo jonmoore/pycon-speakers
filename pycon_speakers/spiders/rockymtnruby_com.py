@@ -5,7 +5,7 @@ from scrapy.selector import Selector
 from scrapy.http import Request
 
 from pycon_speakers.loaders import SpeakerLoader
-
+import re
 
 class RmRubySpider(Spider):
     name = 'rockymtnruby.com'
@@ -59,14 +59,8 @@ class RmRubySpider(Spider):
     def _parse_workshop_2013(self, response):
         for section in Selector(response).xpath("//div[contains(@id,'workshop')]"):
             names = section.xpath(".//h2/text()").extract()[0]
-            for name in self._split_names(names):
+            for name in re.split(' with |,', names):
                 il = SpeakerLoader(selector=section)
                 il.add_value('name', name)
                 il.add_value('year', str(response.meta['year']))
                 yield il.load_item()        
-
-    def _split_names(self, names):
-        name_list = []
-        for name in names.split(','):
-            name_list.extend(name.split(' with '))
-        return name_list

@@ -6,6 +6,7 @@ from scrapy.spider import Spider
 
 from pycon_speakers.loaders import SpeakerLoader
 
+import re
 
 class EuroSciPySpider(Spider):
     """A spider to crawl EuroSciPy's conference speakers.
@@ -29,11 +30,13 @@ class EuroSciPySpider(Spider):
         # The parameter __force_display allows to return all talks without
         # pagination.
         sel = Selector(response)
-        for author in sel.xpath('//tr/td[2]/text()').extract():
-            sl = SpeakerLoader(selector=sel, response=response)
-            # TODO: handle/remove affiliation value and possibly multiple
-            # authors.
-            sl.add_value('conference', 'EuroSciPy')
-            sl.add_value('name', author)
-            sl.add_value('year', response.meta['year'])
-            yield sl.load_item()
+        for authors in sel.xpath('//tr/td[2]/text()').extract():
+            stripe = re.compile(ur'\s*\(.+\)$', re.DOTALL)
+            authors = stripe.sub(u'', authors, re.I)
+            
+            for author in authors.split(','):
+                sl = SpeakerLoader(selector=sel, response=response)
+                sl.add_value('conference', 'EuroSciPy')
+                sl.add_value('name', author)
+                sl.add_value('year', response.meta['year'])
+                yield sl.load_item()

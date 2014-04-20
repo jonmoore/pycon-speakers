@@ -3,6 +3,9 @@ from scrapy.selector import Selector
 from scrapy.http import Request
 
 from pycon_speakers.loaders import SpeakerLoader
+from pycon_speakers.items import Speaker
+
+import re
 
 
 class DjangoConEU(Spider):
@@ -52,16 +55,22 @@ class DjangoConEU(Spider):
 		sel = Selector(response)
 		speakers = sel.css(".right")
 		for speaker in speakers:
-			il = SpeakerLoader(selector=speaker)
-			il.add_css('name', '.right::text')
-			il.add_value('year', str(response.meta['cookiejar']))
-			yield il.load_item()
+			names =  speaker.css('.right::text').extract()[0]
+			for name in re.split(' and |,', names):
+				yield Speaker(
+								name=name,
+                                conference=self.name,
+                                year=str(response.meta['cookiejar'])
+								)
 
 	def parse_2011(self, response):
 		sel = Selector(response)
 		speakers = sel.css('.speakers')
 		for speaker in speakers:
-			il = SpeakerLoader(selector=speaker)
-			il.add_css('name', '.speakers::text')
-			il.add_value('year', str(response.meta['cookiejar']))
-			yield il.load_item()
+			names =  speaker.css('.speakers::text').extract()[0]
+			for name in re.split(' and |,', names):
+				yield Speaker(
+								name=name,
+                                conference=self.name,
+                                year=str(response.meta['cookiejar'])
+								)

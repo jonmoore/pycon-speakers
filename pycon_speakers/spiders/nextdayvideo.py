@@ -23,8 +23,12 @@ class NextDayVideoSpider(Spider):
                     if not authors:
                         # lightning talks, panels, etc.
                         continue
-                    yield Speaker(
-                        name=authors,
-                        conference=conference_name,
-                        year=year
-                    )
+
+                    for author in re.split('\n|,', authors):
+                        author = author.strip()
+                        if author:
+                            yield Speaker(
+                                name=author,
+                                conference=conference_name,
+                                year=year
+                            )

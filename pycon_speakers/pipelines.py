@@ -1,5 +1,4 @@
 import sexmachine.detector as gender
-import requests
 
 class GenderPipeline(object):
 
@@ -14,10 +13,10 @@ class GenderPipeline(object):
 
 
     def _get_firstname(self, name):
-        '''
-        in case the first token contains dot (e.g. Dr., D., S., etc)
-        take the next available token
-        '''
+        
+        # in case the first token contains dot (e.g. Dr., Dr, D., S., etc)
+        # take the next available token
+        
         name_parts = name.split() 
         firstname = name_parts[0]
         if (firstname.find('.') != -1 or len(firstname) < 3) and len(name_parts) > 1:

@@ -10,5 +10,5 @@ done
 # dedupe and merge
 
 # should generate a single header (if not, we have inconsistent data)
-head -n 1 -q data/*.csv | sort -u > alldata.csv
+head -n 1 -q data/*.csv | sort -u > data.csv
 tail -q -n +2 data/*.csv | sort -u >> data.csv

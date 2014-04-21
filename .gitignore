@@ -4,3 +4,7 @@ project.egg-info/
 build/
 
 *.json
+
+.ipynb_checkpoints
+
+*~
